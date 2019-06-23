@@ -1,10 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sawari/src/assets/assets.dart';
 import 'package:sawari/src/widgets/location_widget/location_widget.dart';
 import 'package:sawari/src/widgets/logo/logo.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatelessWidget {
+  Future<List> getCity() async {
+    http.Response res = await http.get('http://sawari.nepsify.com/api/city/');
+    return json.decode(res.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(
@@ -58,18 +66,30 @@ class HomePage extends StatelessWidget {
             SizedBox(height: ScreenUtil().setHeight(15)),
             Expanded(
               child: Container(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 5 / 4,
-                  ),
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    return LocationWidget(
-                      city: 'Kathmandu',
-                    );
-                  },
-                ),
+                child: FutureBuilder(
+                    future: getCity(),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (!snapshot.hasData)
+                        return Center(child: CircularProgressIndicator());
+
+                      List cities = snapshot.data;
+
+                      return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 5 / 4,
+                          ),
+                          itemCount: cities.length,
+                          itemBuilder: (context, index) {
+                            var city = cities[index];
+                            return LocationWidget(
+                              city: city["name"],
+                              image: city['city_image'],
+                            );
+                          });
+                    }),
               ),
             ),
           ],

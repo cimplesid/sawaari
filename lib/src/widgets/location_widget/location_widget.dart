@@ -4,10 +4,12 @@ import 'package:sawari/src/assets/assets.dart';
 
 class LocationWidget extends StatelessWidget {
   final String city;
+  final String image;
 
   const LocationWidget({
     Key key,
     @required this.city,
+    this.image,
   }) : super(key: key);
 
   @override
@@ -28,12 +30,8 @@ class LocationWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(
               ScreenUtil().setWidth(10),
             ),
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(
-                Images.kathmandu,
-              ),
-            ),
+            image:
+                DecorationImage(fit: BoxFit.cover, image: NetworkImage(image)),
           ),
         ),
         Container(
@@ -52,7 +50,7 @@ class LocationWidget extends StatelessWidget {
             ),
             alignment: Alignment.bottomLeft,
             child: Text(
-              'Kathmandu',
+              city,
               style: TextStyle(
                 fontSize: FontSize.fontSize14,
                 color: Colors.white,
